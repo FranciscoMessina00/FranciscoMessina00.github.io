@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ==" crossorigin="anonymous" referrerpolicy="no-referrer">import * as Tone from "tone";</script>
+        <!-- <script src="synth.js"></script> -->
+        <script src="Model/Defaults.js" defer></script>
+        <script src="Classes.js" defer></script>
+        <script src="Model/Model knobs.js" defer></script>
+        <script src="Model/Model sequencer.js" defer></script>
+        <script src="Model/Model synth.js" defer></script>
+        <script src="View/ViewKnobs.js" defer></script>
+        <script src="View/ViewSequencer.js" defer></script>
+        <script src="View/ViewChannels.js" defer></script>
+        <script src="Controller/Controller knobs.js" defer></script>
+        <script src="Controller/Controller sequencer.js" defer></script>
+        <link rel="stylesheet" href="elements.css"></style>
+    </head>
+    <body>
+        <div id="tot">
+            <div id="wholeContainer">
+                <div id="titleContainer" style="display: none;"><button class="arrow-left" onclick="changeChannelLeft()"></button><div id="channelName" class="bigTitle">Channel 1</div><button class="arrow-right" onclick="changeChannelRight()"></button></div>
+                <!-- Oscillator section -->
+                <div id="oscillator" class="blockSection">
+                    <div class="bigTitle">Oscillator</div>
+                    <div class="knobContainer">
+                        <div id="wavTypeContainer" class="container arrows">
+                            <button class="arrow-left" onclick="changeLeft('oscillator')"></button><div class="waveType"><img id="oscImg" src="View/Images/Sine.png" alt="Wave type"></div><button class="arrow-right" onclick="changeRight('oscillator')"></button>
+                            <div id="osc_param.type" class="label"><input class="inputEl" disabled id="oscType" type="text" value="sine"></div>
+                        </div>
+                        <div id="frequencyContainer" class="container">
+                            <div style="display:inline-flex">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div style="display: flex;margin: auto;align-items: center;flex-direction: column;position: relative;"><input type="checkbox" id="ch_freq" onchange=""/><label for="ch_freq"></label></div>    
+                            </div>
+                            <div id="osc_param.freq" onclick="focusInput()" class="label">Frequency: <input class="inputEl" onfocus="this.select()" type="number" value="440" step="1" min="20" max="20000">Hz</div>
+                        
+                        </div>
+                        <div id="harmonicityContainer" class="container">
+                            <div class="knob"><div class="dot"></div></div>
+                            <div id="osc_param.harm" onclick="focusInput()" class="label">Harmonicity: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="0.6" min="0" max="30"></div>
+                        </div>
+                        <div id="modTypeContainer" class="container arrows">
+                            <button class="arrow-left" onclick="changeLeft('modulation')"></button><div class="waveType"><img id="modImg" src="View/Images/Sine.png" alt="Wave type"></div><button class="arrow-right" onclick="changeRight('modulation')"></button>
+                            <div id="osc_param.modType" class="label">Mod type: <input class="inputEl" id="modType" type="text" value="Sine"></div>
+                        </div>
+                        <div id="modAmtContainer" class="container">
+                            <div class="knob"><div class="dot"></div></div>
+                            <div id="osc_param.mod" onclick="focusInput()" class="label">Mod amount: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="3" min="0" max="100"></div>
+                        </div>
+                    </div>
+                    <div class="smallTitle">Amplitude properties</div>
+                    <div style="display: flex;align-items: center;justify-content: center;">
+                        <div class="knobContainer">
+                            <div id="oscillatorAttackContainer" class="container largerContainer">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="adsr_mix.attack" onclick="focusInput()" class="label">Attack: <input class="inputEl" onfocus="this.select()" type="number" value="500" step="1" min="0" max="3000">ms</div>
+                            </div>
+                            <div id="oscillatorReleaseContainer" class="container largerContainer">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="adsr_mix.release" onclick="focusInput()" class="label">Release: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="500" min="0" max="3000">ms</div>
+                            </div>
+                            <div id="LFORateContainer" class="container largerContainer">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="LFO.rate" onclick="focusInput()" class="label">LFO rate: <input class="inputEl" onfocus="this.select()" type="number" value="2" step="0.1" min="0.1" max="200">Hz</div>
+                            </div>
+                            <div id="lfoAmtContainer" class="container largerContainer">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="osc_param.LFOamt" onclick="focusInput()" class="label">LFO amount: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="3" min="0" max="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filter section -->
+                <div id="filter1" class="blockSection">
+                    <div class="bigTitle">Filter</div>
+                    <div class="knobContainer">
+                        
+                    </div>
+                </div>
+                <!-- Drum elements -->
+                <div id="drumSection">
+                    <div id="kick" class="blockSection limitWidth">
+                        <div class="bigTitle">Kick</div>
+                        <div class="knobContainer">
+                            <div id="kickPitchContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="kick_param.pitch" onclick="focusInput()" class="label">Frequency: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="50" min="30" max="100">Hz</div>
+                            </div>
+                            <div id="kickReleaseContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="kick_param.r" onclick="focusInput()" class="label">Release: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="300" min="200" max="2000">ms</div>
+                            </div>
+                            <div id="kickFreqRelContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="kick_param.fr" onclick="focusInput()" class="label">Pitch release: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="500" min="1" max="1000">ms</div>
+                            </div>
+                            <div id="kickSweepContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="kick_param.sweep" onclick="focusInput()" class="label">Sweep: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="200" min="0" max="400"></div>
+                            </div>
+                            <div id="kickVolumeContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="kick_param.volume" onclick="focusInput()" class="label">Gain: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="1" min="0" max="1"></div>
+                            </div>
+                            <div id="kickPositionContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="kick_param.position" onclick="focusInput()" class="label">Panning: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="0" min="-1" max="1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="snare" class="blockSection limitWidth">
+                        <div class="smallTitle">Snare</div>
+                        <div class="knobContainer">
+                            <div id="snarePitchContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="snare_param.pitch" onclick="focusInput()" class="label">Frecuency: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="100" min="50" max="200">Hz</div>
+                            </div>
+                            <div id="snareReleaseContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="snare_param.r" onclick="focusInput()" class="label">Release: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="400" min="100" max="1000">ms</div>
+                            </div>
+                            <div id="snareColorContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="snare_param.color" onclick="focusInput()" class="label">Color: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="3" min="1" max="4"></div>
+                            </div>
+                            <div id="snareSweepContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="snare_param.sweep" onclick="focusInput()" class="label">Sweep: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="250" min="0" max="500"></div>
+                            </div>
+                            <div id="snareVolumeContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="snare_param.volume" onclick="focusInput()" class="label">Gain: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="1" min="0" max="1"></div>
+                            </div>
+                            <div id="snarePositionContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="snare_param.position" onclick="focusInput()" class="label">Panning: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="0" min="-1" max="1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="hihat" class="blockSection limitWidth">
+                        <div class="smallTitle">Hi-hat</div>
+                        <div class="knobContainer">
+                            <div id="hatCutoffContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="hat_param.cutoff" onclick="focusInput()" class="label">Cutoff: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="500" min="100" max="4000"></div>
+                            </div>
+                            <div id="hatReleaseContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="hat_param.r" onclick="focusInput()" class="label">Release: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="100" min="50" max="300"></div>
+                            </div>
+                            <div id="hatVolumeContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="hat_param.volume" onclick="focusInput()" class="label">Gain: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="1" min="0" max="1"></div>
+                            </div>
+                            <div id="hatPositionContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="hat_param.position" onclick="focusInput()" class="label">Panning: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="0" min="-1" max="1"></div>
+                            </div>
+                            <div id="hatOpClContainer" class="switch">
+                                <div style="display: flex;"><div class="open_box">Open</div><input type="checkbox" id="ch_oc" onchange="sw_ar('ch_oc', 'adsr_mix.decay', 'adsr_mix.sustain')"/><label for="ch_oc" style="rotate:0deg"></label><div class="closed_box">Closed</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tom" class="blockSection limitWidth">
+                        <div class="smallTitle">Tom</div>
+                        <div class="knobContainer">
+                            <div id="tomPitchContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="tom_param.hiPitch" onclick="focusInput()" class="label">Frequency: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="150" min="70" max="220">hz</div>
+                            </div>
+                            <div id="tomReleaseContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="tom_param.r" onclick="focusInput()" class="label">Release: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="200" min="100" max="700"></div>
+                            </div>
+                            <div id="tomColorContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="tom_param.color" onclick="focusInput()" class="label">Color: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="0.5" min="0" max="1"></div>
+                            </div>
+                            <div id="tomVolumeContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="tom_param.volume" onclick="focusInput()" class="label">Gain: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="1" min="0" max="1"></div>
+                            </div>
+                            <div id="tomPositionContainer" class="container">
+                                <div class="knob"><div class="dot"></div></div>
+                                <div id="tom_param.position" onclick="focusInput()" class="label">Panning: <input class="inputEl" onfocus="this.select()" type="number" step="0.1" value="0" min="-1" max="1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Global controls -->
+                <div id="controlBlock" class="blockSection">
+                    <div class="bigTitle">Global controls</div>
+                    <button onclick="player.start(seq)">Yeah baby</button>
+                    <button onclick="player.stop(seq)">Stop</button>
+                    <button>Hear</button>
+                    <button>Copy to all</button>
+                    <div id="bpmContainer" class="container">
+                        <div class="knob"><div class="dot"></div></div>
+                        <div id="globals.bpm" onclick="focusInput()" class="label">BPM: <input class="inputEl" onfocus="this.select()" type="number" step="1" value="120" min="30" max="300"></div>
+                    </div>
+                </div>
+                <div id="containerSequencer">
+                    <div class="separationSteps ch1" id="ch1"><div class="littleSteps"></div></div>
+                    <div id="canvasContainer" class="separationSteps active"><canvas id="step" ></canvas></div>
+                    <!-- <div class="separationSteps ch2" id="ch2"><div class="littleSteps"></div></div>
+                    <div class="separationSteps ch3" id="ch3"><div class="littleSteps"></div></div> -->
+                    <div class="separationSteps ch4" id="ch2"><div class="littleSteps"></div></div>
+                </div>
+            </div>
+        </div>
+    </body>
+    
+</html>    
+
