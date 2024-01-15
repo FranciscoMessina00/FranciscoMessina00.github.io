@@ -1,5 +1,3 @@
-// Tone.start();
-
 var seq = new Sequencer();
 var player = new Player();
 var canvas = document.getElementById("step");

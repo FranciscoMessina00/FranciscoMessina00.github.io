@@ -13,13 +13,7 @@ function drawDodecagon(index, stepPlaying){
         if(index == seq.getSelected()){
             ctx.lineWidth = 10*scale;
             ctx.strokeStyle = strokeSelected;
-            // grd.addColorStop(1*scale, colorDodOnOut);
-            // grd.addColorStop(0*scale, colorDodOnIn);
         }
-        // else{
-        //     grd.addColorStop(1*scale, colorDodOffOut);
-        //     grd.addColorStop(0*scale, colorDodOffIn);
-        // }
         
         determineGradient(index, grd, seq.getChannelIndex());
         
@@ -59,10 +53,8 @@ function drawRect(step, index, stepPlaying){
 function drawStep(posX, posY, scale = 1, step = 0, index = 0, stepPlaying = 0){
     ctx.clearRect(clearArea.x + (canvas.width / 16) * index, clearArea.y, clearArea.width, clearArea.height);
     ctx.translate(posX, posY);
-    // ctx.scale(scale, scale);
     drawDodecagon(index, stepPlaying);
     drawRect(step, index, stepPlaying);
-    // ctx.scale(1/scale, 1/scale);
     ctx.translate(-posX, -posY);
 }
 
@@ -133,12 +125,9 @@ var roundedPoly = function(points,radius){
 function drawSequencer(){
     // calculating the space between the dodecagons
     for (var i = 0; i < 16; i++) {
-        // drawStep((100  + i * 220 + 10) * scale, (100 + 10) * scale, scale, steps[i], i == selected);
-        // starting drawing 100 pixels plus a padding from the left 
-        // console.log(seq.getChannelSteps()[i]);
+        // starting drawing 100 pixels plus a padding from the left         
         drawStep((100 + space/2) * scale + (canvas.width / 16) * i, heightShift, scale, seq.getChannelSteps()[i].getToPlay(), i, seq.getStepPlaying());
     }
-    // requestAnimationFrame(drawSequencer);
 }
 
 function drawSingleStep(i){
@@ -193,7 +182,6 @@ function spaceRelease(index){
     return proportion;
 }
 function colorStep(index){
-    // console.log(index);
     var step = seq.getIndexStep(index);
     var frequency = step.getOscParam().freq;
     var hue = Math.log10(frequency) / Math.log10(20000);
@@ -216,9 +204,8 @@ function colorStep(index){
     var harm = step.getOscParam().harm==0 ? 0.1 : step.getOscParam().harm;
     var vol = parseFloat(step.getOscParam().volume)==0 ? 0.1 : parseFloat(step.getOscParam().volume);
     var valueColor = (vol/2) + (Math.log(mod * harm + 1)/(2 * Math.log(3000 + 1)));
-    // console.log(hue, saturation, valueColor)
     var rgb = hsvToRgb(hue, saturation, valueColor);
-    // console.log(rgb);
+
     return "#" + ((1 << 24) + (rgb.red << 16) + (rgb.green << 8) + rgb.blue).toString(16).slice(1);;
 }
 function hsvToRgb(h, s, v) {

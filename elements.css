@@ -153,16 +153,13 @@ button{
     background-color: #D9D9D9;
     cursor: pointer;
 }
-.copertina{
-    width: 312px;
-    height: 78px;
-    pointer-events: none;
-    filter: invert(100%) sepia(6%) saturate(71%) hue-rotate(292deg) brightness(93%) contrast(81%);
-}
 .copertinaContainer{
-    margin-top: 20px;
+    margin-top: 10px;
+    padding: 0 20px;
     display: flex;
     flex-direction: row;
+    align-items: center;
+    text-align: center;
     justify-content: center;
 }
 .knob{

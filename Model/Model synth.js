@@ -1,67 +1,5 @@
-// const c = new AudioContext();
-// c.resume();
 Tone.setContext(new Tone.Context({ latencyHint : "playback" }))
 Tone.context.lookAhead = 0.2;
-
-// var osc_param = {
-//     freq : 440, 
-//     type : "sine", 
-//     modtype: "sine", 
-//     harm : 1.3, 
-//     mod : 1,
-//     LFOamt: 1000,
-// }
-// var global = {
-//     glide : 0,
-//     pwm : 0,
-//     vibrato : 0,
-//     position: 0,
-//     //LFOpos: 1,
-// }
-
-// var filter_param = {
-//     cutoff: 3000,
-//     resonance : 0,
-//     // keyboard_tracking : 0,
-//     type : 'lowpass',
-//     env_amount : 0,
-//     LFO_amount : 0,
-// }
-
-// var LFO = {
-//     waveform : 'sine',
-//     rate : 2,
-//     sync : false,
-// }
-
-// var adsr_mix = {
-//     is_ar : false,
-//     attack : 0.5,
-//     decay : 0.5,
-//     sustain: 0.5,
-//     release : 2 
-// }
-
-// var adsr_filter = {
-//     is_ar : false,
-//     attack : 1,
-//     decay : 0.6,
-//     sustain: 0.5,
-//     release : 1
-// }
-// Parameters for the synth
-// var filter = Synth.createFilter(filter_param, adsr_filter);
-// var ampEnv = Synth.createAmpEnv(adsr_mix.attack,adsr_mix.decay,adsr_mix.sustain,adsr_mix.release);
-// var oscillator = Synth.createOscillator(osc_param);
-// var LFO = Synth.createLFO(LFO);
-// // Connections
-// oscillator.fmOsc.chain(ampEnv, filter.filter, Tone.Destination);
-// filter.env.chain(filter.envAmount, filter.filter.frequency);
-// LFO.chain(filter.LFOAmt, filter.filter.frequency);
-// LFO.chain(oscillator.LFOModFm, oscillator.fmOsc.modulationIndex);
-// // Start
-// LFO.start();
-// oscillator.fmOsc.start();
 
 function updateSynthParams(playing=seq.getStepPlaying()){
     var chn = seq.getAllSteps();
@@ -71,8 +9,6 @@ function updateSynthParams(playing=seq.getStepPlaying()){
             if(chn[i].getType() == "melody"){
                 updateOscillator(chn[i].getOscillator(), stp.osc_param);
                 updateEnv(chn[i].getAmpEnv(), stp.adsr_mix);
-                // updateFilter(chn[i].getFilter(), stp.filter_param);
-                // updateEnv(chn[i].getFilterEnv(), stp.adsr_filter);
                 updateLFO(chn[i].getLFO(), stp.LFO);
             }else{
                 if(stp.kick_param.volume > 0){
@@ -135,20 +71,20 @@ function updateEnv(env, par){
     })
 }
 
-function updateFilter(fil, par){
-    // fil.set({
-    //     frequency : par.cutoff,
-    //     Q : par.resonance,
-    //     type : par.type
-    // })
-    fil.filter.set({
-        frequency : par.cutoff,
-        Q : par.resonance,
-        type : par.type
-    })
-    fil.envAmount.set({gain : par.env_amount});
-    fil.LFOAmt.set({gain : par.LFO_amount});
-}
+// function updateFilter(fil, par){
+//     // fil.set({
+//     //     frequency : par.cutoff,
+//     //     Q : par.resonance,
+//     //     type : par.type
+//     // })
+//     fil.filter.set({
+//         frequency : par.cutoff,
+//         Q : par.resonance,
+//         type : par.type
+//     })
+//     fil.envAmount.set({gain : par.env_amount});
+//     fil.LFOAmt.set({gain : par.LFO_amount});
+// }
 
 function updateLFO(lfo, par){
 
@@ -276,16 +212,14 @@ function updateFlanger(){
     flanger.colorr.set({
         fade: flanger_par.color,
     })
-    flanger.overdrivel = new Tone.WaveShaper(function (val) {
-
+    flanger.overdrivel.setMap(function (val) {
         var amt = 3 - flanger_param.feedback;  // Bisogna abbassare l'amt di distorsione perché con valori di feedback troppo alti si rischia l'auto-oscillazione del flanger. Il carattere della distorsione dipende tantissimo dal feedback e non solo per l'operazione di sottrazione ma soprattutto per come questo cambia il flusso del segnale audio
         return Math.tanh(2^(amt*val));  //tanh e 2^val sono funzioni utilizzate nel design di distorsori. Io le ho combinate, se volete sperimentate altre funzioni.
-        }, 2048);
-    flanger.overdriver = new Tone.WaveShaper(function (val) {
-
+        });
+    flanger.overdriver.setMap(function (val) {
         var amt = 3 - flanger_param.feedback;  // Bisogna abbassare l'amt di distorsione perché con valori di feedback troppo alti si rischia l'auto-oscillazione del flanger. Il carattere della distorsione dipende tantissimo dal feedback e non solo per l'operazione di sottrazione ma soprattutto per come questo cambia il flusso del segnale audio
         return Math.tanh(2^(amt*val));  //tanh e 2^val sono funzioni utilizzate nel design di distorsori. Io le ho combinate, se volete sperimentate altre funzioni.
-        }, 2048);
+        });
 }
 function updateFolder(){
     var folder_par = seq.getCurrentStep().getFolder();

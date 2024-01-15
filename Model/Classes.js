@@ -105,9 +105,8 @@ class Channel{
             this.oscillator = Synth.createOscillator(osc_param);
             this.LFO = Synth.createLFO(LFO);
             this.flanger = Synth.createFlanger(flanger_param);
-            // this.folder = Synth.brutalize(fold_param.fold_amt, fold_param.dist_amt, 0.5);
-            // Connections
             this.folder = Synth.brutalize(this.ampEnv, fold_param.fold_amt, fold_param.dist_amt, fold_param.drywet);
+            // Connections
             this.oscillator.fmOsc.connect(this.ampEnv);
             this.folder.drywetBlock.chain(this.oscillator.volume, this.oscillator.pan, this.flanger.s);
             this.oscillator.pan.connect(this.flanger.dryWet.a);
@@ -116,7 +115,6 @@ class Channel{
             // this.LFO.chain(this.filter.LFOAmt, this.filter.filter.frequency);
             this.LFO.chain(this.oscillator.LFOModFm, this.oscillator.fmOsc.modulationIndex);
             this.LFO.start()
-            // this.instrument = new Tone.Synth().toDestination();
             this.oscillator.fmOsc.start();
         } else {
             this.kick = Synth.createKick(kick_param);
@@ -129,15 +127,6 @@ class Channel{
             this.hat.pan.connect(Tone.Destination);
             this.tom.pan.connect(Tone.Destination);
 
-            // this.kick.pan.connect(this.flanger.s);
-            // this.snare.pan.connect(this.flanger.s);
-            // this.hat.pan.connect(this.flanger.s);
-            // this.tom.pan.connect(this.flanger.s);
-            // this.kick.pan.connect(this.flanger.dryWet.a);
-            // this.snare.pan.connect(this.flanger.dryWet.a);
-            // this.hat.pan.connect(this.flanger.dryWet.a);
-            // this.tom.pan.connect(this.flanger.dryWet.a);
-            // this.flanger.dryWet.connect(this.limiter);
         }
     }
 
@@ -174,9 +163,6 @@ class Channel{
     getSteps(){
         return this.steps;
     }
-    // playChannel(note, time){
-    //     this.steps[seq.getStepPlaying()].playSound(note, time, this.ampEnv);     
-    // }
     resetFolder(){
         this.folder.folder.setMap(
             function(val){
@@ -253,14 +239,10 @@ class Step{
         if(this.toPlay == 1 || singlePlay){
             if(!singlePlay){
                 // to stop the previous envelope we trigger the release
-                // ampEnv.triggerRelease(time)
                 ampEnv.triggerAttackRelease(ampEnv.attack, time + 0.1);
             }else{
-                //console.log("singlePlay")
                 // I had to add the start and stop of the transport because otherwise the synth would not play
                 // whenn I started the page. I don't know why this happens, but it works.
-                // Tone.Transport.start();
-                // Tone.Transport.stop();
                 ampEnv.triggerAttackRelease(ampEnv.attack);
             }
             
@@ -395,7 +377,7 @@ class Synth{
     }
     
     static createKick(kick_param) {
-        var o = new Tone.Oscillator(kick_param.pitch, "triangle");   //Vogliamo lasciare la possibilità di cambiare forma d'onda? Potrebbe essere un'idea  
+        var o = new Tone.Oscillator(kick_param.pitch, "triangle"); 
         var amp = new Tone.AmplitudeEnvelope();
         amp.set({
             attack: kick_param.a/1000,
@@ -463,14 +445,14 @@ class Synth{
         tonal.start();
         noise.start();
         return {
-        pan: pan,
-        amp: amp,
-        freqEnv: freqEnv,
-        tonal: tonal,
-        noise: noise,
-        balance: balance,
-        volume: volume,
-        freqEnvAmt: freqEnvAmt,
+            pan: pan,
+            amp: amp,
+            freqEnv: freqEnv,
+            tonal: tonal,
+            noise: noise,
+            balance: balance,
+            volume: volume,
+            freqEnvAmt: freqEnvAmt,
         }
     }
 
@@ -584,7 +566,7 @@ class Synth{
         LFOl.start();
         LFOr.start();
         return {
-            s: s, //Ho voluto fare le connessioni interne del flanger dentro la funzione, ho messo a disposizione solo il nodo in e out
+            s: s, //Ho voluto fare le connessioni interne del flanger dentro la funzione
             dryWet: dryWet,
             colorl: colorl,
             colorr: colorr,
@@ -658,7 +640,6 @@ class Player{
     start(sequencer){
         if(!seq.isPlaying()){
             sequencer.play();
-            // Tone.start();
             Tone.Transport.start();
         }
     }
@@ -670,10 +651,8 @@ class Player{
         drawSequencer();
     }
     playSound(time){
-        // var notes = ["C4", "E4", "G4", "B4"];
         var channels = seq.getAllSteps();
         for (var i = 0; i < seq.getNChannels(); i++) {
-            // channels[i].playChannel(notes[i], time);
             channels[i].playChannel(time);
         }
         

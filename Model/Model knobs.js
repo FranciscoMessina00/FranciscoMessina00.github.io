@@ -1,4 +1,3 @@
-
 const enterKey = new KeyboardEvent('keydown', {
     key: 'Enter',
     code: 'Enter',
@@ -25,8 +24,6 @@ var waveTypes = ["sine", "triangle", "square", "sawtooth"];
 var filterTypes = ["lowpass", "highpass", "bandpass"];
 
 function updateParamValue(){
-    // console.log(quant_f[1]['note']);
-
     spl = label.parentNode.id.split(".");
     var lbl_value = label.value;
     if (spl[0] == "globals"){
@@ -60,9 +57,8 @@ function updateParamValue(){
         updateFolder();
     }else{
         var stp = seq.getChannelSteps();
-        // console.log(stp[seq.getSelected()])
-
         var params = stp[seq.getSelected()].getParams();
+
         if(!seq.isPlaying()){
             updateSingleSynthParams()
         }
@@ -78,25 +74,13 @@ function updateParamValue(){
             }
         }
         
-        
-        
-        
-        //console.log(spl)
-
-
-
-        //console.log(def_value);
-
         for (let i = 0; i < params.length; i++) {
             if(params[i] == spl[0]){
-                // console.log("yao");
                 tmp_dict = params[i+1];
                 for (var [key, value] of Object.entries(params[i + 1])){
                     if(key == spl[1]){
-                        
                         tmp_dict[key] = lbl_value;
                         params[i+1] = tmp_dict;
-                        //console.log(tmp_dict);
                     }
                 }
             }
@@ -106,19 +90,4 @@ function updateParamValue(){
         stp[seq.getSelected()].setParams(params)
     }
     
-}
-
-
-//function to copy current view value to all channel's steps
-function copyToAll(){
-    var steps = seq.getChannelSteps();
-    var current_pars = steps[seq.getSelected()].getParams();
-    
-    steps.forEach(e => {    
-        e.setParams(current_pars)
-        // e.resetParams()
-    });
-    // knobs.forEach(kn =>{updateKnobView(kn)})
-    // updateParamValue()
-    drawSequencer()
 }
