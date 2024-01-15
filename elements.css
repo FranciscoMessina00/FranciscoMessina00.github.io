@@ -75,16 +75,11 @@ button{
     flex-wrap: wrap;
 }
 #tot{
-    display:flex;
-    justify-content: center;
-    align-items: center;
     height: 100%;
+    width: fit-content;
+    margin: 0 auto;
 }
-#filter1{
-    width: 400px;
-    display: block;
-}
-#oscillator{
+#effects, #oscillator{
     width: 400px;
     display: block;
 }
@@ -104,16 +99,36 @@ button{
     width: 845px;
     display: none;
 }
+#play {
+    width: 0;
+    height: 0;
+    border-top: 16px solid transparent;
+    border-left: 24px solid #44116C;
+    border-bottom: 16px solid transparent;
+    margin: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+#stop {
+    width: 25px;
+    height: 25px;
+    background-color: #44116C;
+    margin: 5px;
+    /* margin-left: 10px; */
+    cursor: pointer;
+    border-radius: 2px;
+}
 .knobContainer{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
-.container{
+.container, .containerControl{
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    /* height: 100%; */
     /* width: auto; */
     min-width: 120px;
     align-content: center;
@@ -127,10 +142,32 @@ button{
 .smallerContainer{
     min-width: 120px;
 }
+.control{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    width: var(--size-knob);
+    height: var(--size-knob);
+    border: 1px solid #44116C;
+    background-color: #D9D9D9;
+    cursor: pointer;
+}
+.copertina{
+    width: 312px;
+    height: 78px;
+    pointer-events: none;
+    filter: invert(100%) sepia(6%) saturate(71%) hue-rotate(292deg) brightness(93%) contrast(81%);
+}
+.copertinaContainer{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
 .knob{
     display:flex;
     justify-content: center;
-    /* align-items: center; */
     border-radius: 50%;
     width: var(--size-knob);
     height: var(--size-knob);
@@ -340,3 +377,14 @@ label:active:after {
     align-items: center;
     margin: 0 5px;
 }
+.goldStep{
+    background-color: #6C3D11
+}
+.redStep{
+    background-color: #C80000
+}
+.violet{
+    filter: invert(12%) sepia(83%) saturate(2974%) hue-rotate(267deg) brightness(75%) contrast(103%);
+}
+.red{
+    filter: invert(14%) sepia(26%) saturate(3728%) hue-rotate(333deg) brightness(90%) contrast(110%);}

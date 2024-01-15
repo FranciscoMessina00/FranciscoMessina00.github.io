@@ -55,15 +55,60 @@ function updateKnobView(kn){
     knob = kn.querySelector(".knob");
     label = kn.querySelector(".inputEl");
     // we split the id of the label to get the parameter name and the parameter type
-    spl = label.parentNode.id.split(".")
+    var spl = label.parentNode.id.split(".")
+    var stp = seq.getChannelSteps();
+    var params = stp[seq.getSelected()].getParams();
 
+    
     // we check if the parameter is a global parameter or not, for know we don't do anything
     if(spl[0] == "globals"){
             // console.log(spl[0]);
+    }else if(seq.getChannelIndex() == 0 &&(spl[0] == "osc_param")&&(spl[1] == "freq")){
+        // console.log(seq.getChannelIndex())
+        var quant = stp[seq.getSelected()].getOscParam().quant
+        var ck = knob.parentNode.children[1].children[0]
+
+        isLabelFrequency = true;
+        if(quant){
+            var i = 0
+            while (quant_f[i]['freq'] != params[1].freq) {
+                i++;
+            }
+            
+            label.value = quant_f[i]['freq'];
+            normalizedValue = normalizeToAngle(label, isLabelFrequency);
+            knob.style.rotate = normalizedValue + "deg";
+            label.type = 'text';
+            label.value = quant_f[i]['note']
+            ck.checked = true;
+            label.disabled = true;
+            var type = document.getElementById("typeOfValue");
+            type.innerHTML = "Note";
+            var udm = document.getElementById("unitOfMeasure");
+            udm.innerHTML = "";
+            // drawSequencer()
+        }else{
+            label.type = 'number';
+            label.value = params[1].freq
+            ck.checked = false
+            label.disabled = false;
+            normalizedValue = normalizeToAngle(label, isLabelFrequency);
+            knob.style.rotate = normalizedValue + "deg";
+            var type = document.getElementById("typeOfValue");
+            type.innerHTML = "Frequency";
+            var udm = document.getElementById("unitOfMeasure");
+            udm.innerHTML = "Hz";
+            labelToChange = label;
+            // updateKnob()
+            
+        }
+        updateColorChannel(seq.getChannelIndex());
+        resizeInput(label)
     } // if the parameter is not a global parameter we proceed
     else{
         // we get the steps of the current selected channel
-        stp = seq.getChannelSteps();
+        
+        var def_value = 0;
 
         //check if adsr-ar switch has been changed previously for this step; if so updates view 
         // if(spl[1] == "decay" || spl[1] == "release"){
@@ -103,9 +148,11 @@ function updateKnobView(kn){
         // }
         // console.log(stp)
         // we get the parameters of the current selected channel
-        params = stp[seq.getSelected()].getParams();
+        
         // we initialize the default value to set to the parameter to 0
-        var def_value = 0;
+        // if(seq.getChannelIndex == 0){
+        //     params.push("flanger_param", seq.getChannel().getFlanger().params);
+        // }
         // we loop through the params of step file to get the current value of the parameter
         for (let i = 0; i < params.length; i++) {
             if(params[i] == spl[0]){
@@ -127,7 +174,10 @@ function updateKnobView(kn){
             knob.style.rotate = normalizedValue + "deg";
         }
         // we resize the html to fit the value of the label and update the images of the waveforms
-        updateWaveTypes();
+        if(seq.getChannelIndex() != 1){
+            // we update the images of the waveforms only if we are in the oscillator channel
+            updateWaveTypes();
+        }
         resizeInput(label);
     }
 }
@@ -143,6 +193,10 @@ function updateWaveTypes(){
     var modType = document.getElementById("modImg");
     var file = "View/Images/" + params[1].modType + ".png";
     modType.src = file;
+
+    var flangType = document.getElementById("flangImg");
+    var file = "View/Images/" + params[7].type + ".png";
+    flangType.src = file;
 }
 
 function normalizeToAngle(label, frequency=false){
@@ -199,6 +253,8 @@ function focusInput(){
 function updateKnob(){
     // Here we update the knob when we press enter, blur means that we can't write on the input anymore
     labelToChange.blur();
+    if(parseFloat(labelToChange.value) > labelToChange.max) labelToChange.value = labelToChange.max;
+    if(parseFloat(labelToChange.value) < labelToChange.min) labelToChange.value = labelToChange.min;
     // we update the value of the parameter
     updateParamValue();
     // we resize the input to fit the value of the label
@@ -247,14 +303,38 @@ function onMouseMove(event){
         // we check if the knob is a frequency knob or not, then we map the angle to the value of the parameter
         isLabelFrequency = label.parentNode.id.includes("freq") || label.parentNode.id.includes("cutoff") || label.parentNode.id.includes("rate");
         // we check if the parameter needs decimal places in the value or not
-        if(label.step.length != 1){
-            // if integer we round the value to the nearest integer
-            label.value = normalizeToValue(finalAngleInDegrees, label, isLabelFrequency).toFixed(label.step.length - 2);
-        } else{
-            label.value = normalizeToValue(finalAngleInDegrees, label, isLabelFrequency).toFixed(0);
+        var ck = knob.parentNode.children[1].children[0]
+        if(ck.checked){
+            var i = 0;
+            var curr_val = 0; 
+
+            if(label.step.length != 1){
+                // if integer we round the value to the nearest integer
+                curr_val = normalizeToValue(finalAngleInDegrees, label, isLabelFrequency).toFixed(label.step.length - 2);
+            } else{
+                curr_val = normalizeToValue(finalAngleInDegrees, label, isLabelFrequency).toFixed(0);
+            }
+
+            while (quant_f[i]['freq'] < curr_val && i < 114) {
+                // console.log(quant_f[i]['freq'])
+                i++;
+            }
+    
+            label.type = 'text'
+            label.value = quant_f[i]['note']
+        }else{
+            if(label.step.length != 1){
+                // if integer we round the value to the nearest integer
+                label.value = normalizeToValue(finalAngleInDegrees, label, isLabelFrequency).toFixed(label.step.length - 2);
+            } else{
+                label.value = normalizeToValue(finalAngleInDegrees, label, isLabelFrequency).toFixed(0);
+            } 
         }
         
+        
         resizeInput(label);
+        updateParamValue();
+        drawSingleStep(seq.getSelected());
         // we memorize the last vertical mouse position for the next time we move the mouse (after we onMouseUp will be updated on the next onMouseDown)
         prevMouseY = event.pageY;
     }
@@ -262,7 +342,7 @@ function onMouseMove(event){
 
 function onMouseUp(){ 
     // when we release the mouse button we update the value of the parameter
-    updateParamValue()
+    
     resizeInput(label);
     // we remove the event listener for the mouse move, otherwise the knob will keep rotating when moving the mouse
     document.removeEventListener("mousemove", onMouseMove); //stop drag
@@ -305,7 +385,23 @@ function changeLeft(category){
         
         resizeInput(type);
     }
-    updateParamValue()
+    else{
+        var type = document.getElementById("flangType");
+        var condition = (element) => element == type.value;
+
+        var index = waveTypes.findIndex(condition);
+        index--;
+        if(index < 0){
+            index = 3;
+        }
+        type.value = waveTypes[index].toLowerCase();
+        var file = "View/Images/" + waveTypes[index] + ".png";
+        document.getElementById("flangImg").src = file;
+        
+        resizeInput(type);
+    }
+    updateParamValue();
+    drawSingleStep(seq.getSelected());
 }
 function changeRight(category){
     // we change the image of the knob according to the direction we are going
@@ -321,18 +417,6 @@ function changeRight(category){
 
         resizeInput(type);
     }
-    else if(category == "filter"){
-        var type = document.getElementById("filtType");
-        var condition = (element) => element == type.value;
-
-        var index = filterTypes.findIndex(condition);
-        index = (index + 1) % 3;
-        type.value = filterTypes[index].toLowerCase();
-        var file = "View/Images/" + filterTypes[index] + ".png";
-        document.getElementById("filtImg").src = file;
-        
-        resizeInput(type);
-    }
     else if(category == "modulation"){
         var type = document.getElementById("modType");
         var condition = (element) => element == type.value;
@@ -345,7 +429,20 @@ function changeRight(category){
 
         resizeInput(type);
     }
+    else{
+        var type = document.getElementById("flangType");
+        var condition = (element) => element == type.value;
+
+        var index = waveTypes.findIndex(condition);
+        index = (index + 1) % 4;
+        type.value = waveTypes[index].toLowerCase();
+        var file = "View/Images/" + waveTypes[index] + ".png";
+        document.getElementById("flangImg").src = file;
+
+        resizeInput(type);
+    }
     updateParamValue()
+    drawSingleStep(seq.getSelected());
 }
 
 
@@ -428,4 +525,54 @@ function sw_ar(id_ck, id_d, id_s){
     }
     // console.log(lbl.parentNode)
     // updateKnobView(lbl.parentNode)
+}
+
+//function to quantize the frequencies into 440Hz - based notes
+function quantize_frequencies(label){
+    var input = document.getElementById(label).children[1];
+    var ck = document.getElementById(label).parentNode.children[0].children[1].children[0]
+    var curr_val;
+    // console.log(curr_val);
+    
+    
+
+    if(ck.checked == true){
+        seq.getChannelSteps()[seq.getSelected()].getOscParam().quant = true;
+        var i = 0;
+
+        curr_val = Number(input.value);
+
+        while (quant_f[i]['freq'] < curr_val && i < 114) {
+            // console.log(quant_f[i]['freq'])
+            i++;
+        }
+
+        input.type = 'text';
+        input.value = quant_f[i]['note'];
+        input.disabled = true;
+        var type = document.getElementById("typeOfValue");
+        type.innerHTML = "Note";
+        var udm = document.getElementById("unitOfMeasure");
+        udm.innerHTML = "";
+    }
+    else{
+        seq.getChannelSteps()[seq.getSelected()].getOscParam().quant = false;
+        var i = 0;
+        // console.log(quant_f[i]['note'])
+        curr_val = input.value
+        // console.log(curr_val)
+        while (quant_f[i]['note'] != curr_val) {
+            i++;
+        }
+        input.type = 'number'
+        input.value = quant_f[i]['freq'];
+        input.disabled = false;
+        var type = document.getElementById("typeOfValue");
+        type.innerHTML = "Frequency";
+        var udm = document.getElementById("unitOfMeasure");
+        udm.innerHTML = "Hz";
+    }
+    updateColorChannel(seq.getChannelIndex());
+    resizeInput(input);
+    // updateParamValue();
 }

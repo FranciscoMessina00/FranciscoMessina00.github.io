@@ -1,5 +1,20 @@
 // we don't allow the context menu to appear when right clicking
 document.addEventListener('contextmenu', event => event.preventDefault());
+// We add an event listener to the document for user interaction
+document.addEventListener('mousedown', initializeAudio);
+// Function to start the audio on a user interaction
+function initializeAudio() {
+  // We check if the audio context is in a suspended state
+  if (Tone.context.state !== 'running') {
+    console.log("resuming")
+    // We start the audio context
+    Tone.start();
+    Tone.Transport.start();
+    Tone.Transport.stop();
+    // We remove the event listener after it's been triggered once
+    document.removeEventListener('mousedown', initializeAudio);
+  }
+}
 
 // The function detects when the user clicks on the canvas
 function detectClick(){
@@ -33,6 +48,8 @@ function detectClick(){
         if((Math.abs(posX) - i < 100*scale/widthCell) && (Math.abs(posY) - j < 100*scale/heightCell) && (distance < 100*scale/widthCell || distance < 100*scale/heightCell)){
           // we trigger the specific step
           seq.triggerStep(i);
+          drawSingleStep(i);
+          toggleRed(i);
         }
         break;
       case 1:
@@ -49,25 +66,33 @@ function detectClick(){
           // we select the step as a playable step
           seq.setSelected(i);
           knobs.forEach(kn => updateKnobView(kn));
+          updateSingleSynthParams()
+          drawSingleStep(i);
+          drawSingleStep(prevSelected);
+          prevSelected = i;
         }
         break;
     }
   });
 }
 
-Tone.Transport.scheduleRepeat(function(time){
+function repeatingEvent(time){
   // we schedule the metronome of the sequencer with beats every 16th of a note
   // we update the step
-  Tone.Transport.schedule(seq.updateStep(), time);
+  Tone.Transport.schedule(updateSynthParams(), time);
   // we play the step at that specific time
   player.playSound(time);
-}, "16n");
+  Tone.Transport.schedule(changeBorders(), time);
+  Tone.Transport.schedule(seq.updateStep(), time + 0.01);
+}
+
 
 // draw the sequencer
-requestAnimationFrame(drawSequencer);
+drawSequencer();
 detectClick();
 // we draw the channels
 visualizeChannels();
+Tone.Transport.scheduleRepeat(repeatingEvent, "16n");
 // we draw the little steps in the HTML file
 for (var i = 0; i < seq.getNChannels(); i++) {
   var ch = document.getElementById('ch' + (i + 1)).firstChild;
