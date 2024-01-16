@@ -41,7 +41,7 @@ function updateSingleSynthParams(playing=seq.getSelected()){
         updateHat(chn.getHat(), stp.hat_param);
         updateTom(chn.getTom(), stp.tom_param);
     }
-    
+    drawSingleStep(seq.getSelected());
 }
 
 function updateOscillator(osc, par){
